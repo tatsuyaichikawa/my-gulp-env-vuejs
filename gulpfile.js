@@ -1,13 +1,22 @@
-const gulp = require('gulp');
-const webpack = require('webpack-stream');
-const watch = require('gulp-watch');
-const copy = require('gulp-copy');
+const gulp       = require('gulp');
+const browserify = require('gulp-browserify');
+const sass = require('gulp-sass');
+const autoprefixer = require('gulp-autoprefixer');
+const plumber = require('gulp-plumber');
 
-gulp.task('webpack', function(){
-	return gulp.src('src/main.js')
-		.pipe(webpack( require('./webpack.config.js')))
-		.pipe(gulp.dest('dist/js/'))
-		.pipe(connect.reload());
+gulp.task('sass', function() {
+    gulp.src('./src/sass/main.scss')
+        .pipe(plumber())
+        .pipe(sass())
+        .pipe(autoprefixer())
+        .pipe(gulp.dest('./dist'));
+});
+gulp.task('js', () =>{
+gulp.src('./src/*.js')
+  .pipe(browserify({ transform: ['vueify', 'babelify', 'aliasify'] }))
+  .pipe(gulp.dest('./dist'))
 });
 
-gulp.task('')
+// Use NODE_ENV=production in production # process.env.NODE_ENV = 'production'
+
+gulp.task('default', ['sass', 'js']);
